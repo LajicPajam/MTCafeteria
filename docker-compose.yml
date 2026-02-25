@@ -1,0 +1,48 @@
+services:
+  backend:
+    build: ./backend
+    container_name: mtc_cafeteria_backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      USE_MOCK_DATA: ${USE_MOCK_DATA:-true}
+      JWT_SECRET: ${JWT_SECRET:-replace-with-strong-secret}
+      DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:postgres@postgres:5432/mtc_cafeteria}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "${BACKEND_PORT:-3001}:3001"
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend_flutter/Dockerfile
+    container_name: mtc_cafeteria_frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "${FRONTEND_PORT:-8086}:80"
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: mtc_cafeteria_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-mtc_cafeteria}
+    ports:
+      - "${POSTGRES_PORT:-5434}:5432"
+    volumes:
+      - mtc_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mtc_postgres_data:

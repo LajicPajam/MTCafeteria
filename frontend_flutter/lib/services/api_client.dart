@@ -11,14 +11,23 @@ import '../models/user_session.dart';
 
 class ApiClient {
   ApiClient({String? baseUrl})
-    : _baseUrl =
-          baseUrl ??
-          const String.fromEnvironment(
-            'API_BASE_URL',
-            defaultValue: 'http://localhost:3001',
-          );
+    : _baseUrl = baseUrl ?? _resolveBaseUrl();
 
   final String _baseUrl;
+
+  static String _resolveBaseUrl() {
+    const configured = String.fromEnvironment('API_BASE_URL', defaultValue: '');
+    if (configured.isNotEmpty) {
+      return configured;
+    }
+
+    final fromBrowser = Uri.base.origin;
+    if (fromBrowser == 'null') {
+      return 'http://localhost:3001';
+    }
+
+    return fromBrowser;
+  }
 
   Future<({String token, UserSession user})> login({
     required String email,

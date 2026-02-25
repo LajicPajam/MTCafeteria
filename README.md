@@ -76,3 +76,36 @@ flutter run -d chrome --dart-define=API_BASE_URL=http://localhost:3001
 - Replace mock mode with persistent Postgres-only mode for production
 - Add stronger validation and error-handling UX
 - Expand shift/job/task authoring interfaces
+
+## Docker Deploy (Server)
+This mirrors the Edgy Campers setup: a Docker Compose stack with fixed host ports.
+
+1) First-time setup:
+```bash
+cd /home/lajicpajam/projects/MTCafeteria
+cp .env.example .env
+chmod +x deploy_web_stack.sh
+```
+
+2) Build frontend + start stack:
+```bash
+cd /home/lajicpajam/projects/MTCafeteria
+./deploy_web_stack.sh
+```
+
+3) Update on new commits:
+```bash
+cd /home/lajicpajam/projects/MTCafeteria
+git fetch origin
+git checkout main
+git reset --hard origin/main
+./deploy_web_stack.sh
+```
+
+Default exposed ports:
+- Frontend: `8086`
+- Backend API: `3001`
+- Postgres: `5434`
+
+Point your DNS record to the server IP, then browse:
+- `http://<your-domain>:8086`
