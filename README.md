@@ -6,7 +6,7 @@ Lightweight prototype focused on organization and clarity for cafeteria workers.
 - Frontend: Flutter (web)
 - Backend: Node.js + Express + PostgreSQL
 - Auth: Basic email/password with JWT
-- Data mode: Mock-by-default (`USE_MOCK_DATA=true`) for fast prototype startup
+- Data mode: Postgres-first (`USE_MOCK_DATA=false` in production)
 
 ## Project Structure
 - `frontend_flutter/` Flutter web app (role-based dashboards + landing page)
@@ -47,7 +47,7 @@ npm run dev
 ```
 
 Notes:
-- Default `.env.example` uses `USE_MOCK_DATA=true` so you can run without Postgres.
+- In local development, you can use mock mode by setting `USE_MOCK_DATA=true` in `backend/.env`.
 - For Postgres mode, set `USE_MOCK_DATA=false`, create DB, then run schema + seed SQL.
 
 ### 2) Flutter Web
@@ -73,7 +73,6 @@ flutter run -d chrome --dart-define=API_BASE_URL=http://localhost:3001
 - Placeholder scheduling/job/task catalog content only
 
 ## TODO Hooks
-- Replace mock mode with persistent Postgres-only mode for production
 - Add stronger validation and error-handling UX
 - Expand shift/job/task authoring interfaces
 
@@ -84,6 +83,8 @@ This mirrors the Edgy Campers setup: a Docker Compose stack with fixed host port
 ```bash
 cd /home/lajicpajam/projects/MTCafeteria
 cp .env.example .env
+# set a strong JWT secret before continuing
+sed -i 's|^JWT_SECRET=.*|JWT_SECRET=<strong-random-secret>|' .env
 chmod +x deploy_web_stack.sh
 ```
 
@@ -96,16 +97,13 @@ cd /home/lajicpajam/projects/MTCafeteria
 3) Update on new commits:
 ```bash
 cd /home/lajicpajam/projects/MTCafeteria
-git fetch origin
-git checkout main
-git reset --hard origin/main
+git pull --ff-only origin main
 ./deploy_web_stack.sh
 ```
 
 Default exposed ports:
 - Frontend: `8086`
 - Backend API: `3001`
-- Postgres: `5434`
 
 Point your DNS record to the server IP, then browse:
 - `http://<your-domain>:8086`

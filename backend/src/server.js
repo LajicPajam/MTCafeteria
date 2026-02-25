@@ -10,11 +10,25 @@ const taskBoardRoutes = require('./routes/taskBoardRoutes');
 
 const app = express();
 
-app.use(cors());
+app.use(
+  cors({
+    origin(origin, callback) {
+      if (!origin || env.corsOrigins.length === 0 || env.corsOrigins.includes(origin)) {
+        callback(null, true);
+        return;
+      }
+      callback(new Error('CORS origin not allowed.'));
+    },
+  })
+);
 app.use(express.json());
 
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok', useMockData: env.useMockData });
+  res.json({
+    status: 'ok',
+    mode: env.useMockData ? 'mock' : 'postgres',
+    environment: env.nodeEnv,
+  });
 });
 
 app.use('/api/auth', authRoutes);

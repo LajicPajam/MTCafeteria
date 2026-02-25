@@ -13,5 +13,7 @@ Copy `.env.example` to `.env`.
 
 ## Design Notes
 - `USE_MOCK_DATA=true` routes requests through in-memory placeholder data for rapid prototyping.
-- Set `USE_MOCK_DATA=false` to use Postgres with the same route/controller/service interfaces.
+- `USE_MOCK_DATA=false` uses Postgres with the same route/controller/service interfaces.
+- In production, use `USE_MOCK_DATA=false` and set a strong `JWT_SECRET`.
+- Optional: restrict browser access with `CORS_ORIGINS` (comma-separated origin allowlist).
 - Routes are separated into auth/content/training/task-board domains for maintainability.

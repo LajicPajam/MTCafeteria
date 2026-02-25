@@ -6,9 +6,10 @@ services:
     environment:
       NODE_ENV: production
       PORT: 3001
-      USE_MOCK_DATA: ${USE_MOCK_DATA:-true}
+      USE_MOCK_DATA: ${USE_MOCK_DATA:-false}
       JWT_SECRET: ${JWT_SECRET:-replace-with-strong-secret}
       DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:postgres@postgres:5432/mtc_cafeteria}
+      CORS_ORIGINS: ${CORS_ORIGINS:-}
     depends_on:
       postgres:
         condition: service_healthy
@@ -34,10 +35,10 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       POSTGRES_DB: ${POSTGRES_DB:-mtc_cafeteria}
-    ports:
-      - "${POSTGRES_PORT:-5434}:5432"
     volumes:
       - mtc_postgres_data:/var/lib/postgresql/data
+      - ./backend/sql/schema.sql:/docker-entrypoint-initdb.d/10-schema.sql:ro
+      - ./backend/sql/seed.sql:/docker-entrypoint-initdb.d/20-seed.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
       interval: 10s
