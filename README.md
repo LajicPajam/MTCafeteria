@@ -76,8 +76,8 @@ flutter run -d chrome --dart-define=API_BASE_URL=http://localhost:3001
 - Add stronger validation and error-handling UX
 - Expand shift/job/task authoring interfaces
 
-## Docker Deploy (Server)
-This mirrors the Edgy Campers setup: a Docker Compose stack with fixed host ports.
+## Docker Deploy (Fast by Default)
+The frontend container now serves prebuilt `frontend_flutter/build/web` assets using nginx. This avoids pulling the huge Flutter image every deploy.
 
 1) First-time setup:
 ```bash
@@ -88,8 +88,12 @@ sed -i 's|^JWT_SECRET=.*|JWT_SECRET=<strong-random-secret>|' .env
 chmod +x deploy_web_stack.sh
 ```
 
-2) Build frontend + start stack:
+2) Build web assets locally once, then deploy:
 ```bash
+cd /home/lajicpajam/projects/MTCafeteria/frontend_flutter
+flutter pub get
+flutter build web --release --dart-define=API_BASE_URL=
+
 cd /home/lajicpajam/projects/MTCafeteria
 ./deploy_web_stack.sh
 ```
@@ -100,6 +104,12 @@ cd /home/lajicpajam/projects/MTCafeteria
 git pull --ff-only origin main
 ./deploy_web_stack.sh
 ```
+
+Useful deploy flags:
+- `./deploy_web_stack.sh --no-build` restart without rebuilding images
+- `./deploy_web_stack.sh --build-frontend` force local flutter web rebuild first
+
+If Flutter is unavailable locally and web assets are missing, deploy falls back automatically to `frontend_flutter/Dockerfile.builder` (slower dockerized Flutter build).
 
 Default exposed ports:
 - Frontend: `8086`

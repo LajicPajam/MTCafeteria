@@ -19,7 +19,7 @@ services:
   frontend:
     build:
       context: .
-      dockerfile: frontend_flutter/Dockerfile
+      dockerfile: ${FRONTEND_DOCKERFILE:-frontend_flutter/Dockerfile}
     container_name: mtc_cafeteria_frontend
     restart: unless-stopped
     depends_on:
