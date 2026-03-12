@@ -1,0 +1,13 @@
+{
+  "name": "mtcafeteria-tools",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Local tooling for live site screenshots/actions",
+  "scripts": {
+    "live:screenshot": "node tools/live-site.js screenshot",
+    "live:actions": "node tools/live-site.js actions"
+  },
+  "devDependencies": {
+    "playwright": "^1.52.0"
+  }
+}
